@@ -32,9 +32,7 @@ function onDistroLoad(data){
 // Ensure Distribution is downloaded and cached.
 DistroManager.pullRemote().then((data) => {
     logger.log('Loaded distribution index.')
-
     onDistroLoad(data)
-
 }).catch((err) => {
     logger.log('Failed to load distribution index.')
     logger.error(err)

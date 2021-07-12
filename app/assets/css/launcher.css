@@ -2927,6 +2927,25 @@ input:checked + .toggleSwitchSlider:before {
     border-style: solid;
     border-color: transparent transparent rgb(0, 0, 0) transparent;
 }
+
+#refreshSVG:hover {
+    height: 25px;
+    fill: #ffffff;
+}
+
+#linkSVG:hover,
+#linkSVG:focus {
+    fill: #f7ff39;
+}
+#linkSVG:active {
+    fill: #c6d231;
+}
+
+#refreshMediaButton[inprogress] #refreshSVG {
+    animation: spin 0.8s infinite;
+}
+
+
 #image_seal_container[update]:hover #updateAvailableTooltip {
     visibility: visible;
     opacity: 1;
