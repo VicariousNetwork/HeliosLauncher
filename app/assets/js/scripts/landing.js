@@ -117,6 +117,8 @@ document.getElementById('settingsMediaButton').onclick = (e) => {
 }
 
 document.getElementById('refreshMediaButton').onclick = (e) => {
+    let ele = document.getElementById('refreshMediaButton')
+    ele.setAttribute('inprogress', '')
     DistroManager.pullRemote().then((data) => {
         onDistroRefresh(data)
         showMainUI(data)
@@ -133,6 +135,7 @@ document.getElementById('refreshMediaButton').onclick = (e) => {
             shell.openExternal('https://discord.gg/tKKeTdc')
         })
         toggleOverlay(true, true)
+        ele.removeAttribute('inprogress')
     }).catch(err => {
         setOverlayContent(
             'Error Refreshing Distribution',
