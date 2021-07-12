@@ -120,12 +120,50 @@ document.getElementById('settingsMediaButton').onclick = (e) => {
     switchView(getCurrentView(), VIEWS.settings)
 }
 
+
 document.getElementById('openInstanceMediaButton').onclick = (e) => {
     if(ConfigManager.getSelectedServer()){
         shell.openPath(path.join(ConfigManager.getDataDirectory(), 'instances', ConfigManager.getSelectedServer()))
     } else {
         shell.openPath(path.join(ConfigManager.getDataDirectory(), 'instances'))
     }
+
+document.getElementById('refreshMediaButton').onclick = (e) => {
+    let ele = document.getElementById('refreshMediaButton')
+    ele.setAttribute('inprogress', '')
+    DistroManager.pullRemote().then((data) => {
+        onDistroRefresh(data)
+        showMainUI(data)
+        setOverlayContent(
+            'Launcher Refreshed!',
+            'This is a confirmation letting you know that you have manually refreshed your launcher, your server list is now up to date and should be good to go! If you have any problems please do let us know!',
+            'Great! Thank you.',
+            'Join our Discord'
+        )
+        setOverlayHandler(() => {
+            toggleOverlay(false)
+        })
+        setDismissHandler(() => {
+            shell.openExternal('https://discord.gg/tKKeTdc')
+        })
+        toggleOverlay(true, true)
+        ele.removeAttribute('inprogress')
+    }).catch(err => {
+        setOverlayContent(
+            'Error Refreshing Distribution',
+            'We were unable to grab the latest server information from the internet upon startup, so we have used a previously stored version instead.<br><br>This is not recommended, and you should restart your client to fix this to avoid your modpack files being out of date. If you wish to continue using the launcher, you can try again at any time by pressing the refresh button on the landing screen.<br><br>If this continues to occur, and you are not too sure why, come and see us on Discord!<br><br>Error Code:<br>' + err,
+            'Understood.',
+            'Join our Discord'
+        )
+        setOverlayHandler(() => {
+            toggleOverlay(false)
+        })
+        setDismissHandler(() => {
+            shell.openExternal('https://vcnet.work/discord')
+        })
+        toggleOverlay(true, true)
+    })
+
 }
 
 // Bind avatar overlay button.
@@ -776,28 +814,21 @@ function dlAsync(login = true){
     // Validate Forge files.
     setLaunchDetails('Loading server information..')
 
-    refreshDistributionIndex(true, (data) => {
+    DistroManager.pullRemote().then(data => {
         onDistroRefresh(data)
         serv = data.getServer(ConfigManager.getSelectedServer())
         aEx.send({task: 'execute', function: 'validateEverything', argsArr: [ConfigManager.getSelectedServer(), DistroManager.isDevMode()]})
-    }, (err) => {
-        loggerLaunchSuite.log('Error while fetching a fresh copy of the distribution index.', err)
-        refreshDistributionIndex(false, (data) => {
-            onDistroRefresh(data)
+    }).catch(err => {
+        loggerLaunchSuite.error('Unable to refresh distribution index.', err)
+        if(DistroManager.getDistribution() == null){
+            showLaunchFailure('Fatal Error', 'Could not load a copy of the distribution index. See the console (CTRL + Shift + i) for more details.')
+
+            // Disconnect from AssetExec
+            aEx.disconnect()
+        } else {
             serv = data.getServer(ConfigManager.getSelectedServer())
             aEx.send({task: 'execute', function: 'validateEverything', argsArr: [ConfigManager.getSelectedServer(), DistroManager.isDevMode()]})
-        }, (err) => {
-            loggerLaunchSuite.error('Unable to refresh distribution index.', err)
-            if(DistroManager.getDistribution() == null){
-                showLaunchFailure('Fatal Error', 'Could not load a copy of the distribution index. See the console (CTRL + Shift + i) for more details.')
-
-                // Disconnect from AssetExec
-                aEx.disconnect()
-            } else {
-                serv = data.getServer(ConfigManager.getSelectedServer())
-                aEx.send({task: 'execute', function: 'validateEverything', argsArr: [ConfigManager.getSelectedServer(), DistroManager.isDevMode()]})
-            }
-        })
+        }
     })
 }
 
