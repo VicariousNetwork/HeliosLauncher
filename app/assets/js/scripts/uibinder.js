@@ -55,16 +55,16 @@ function getCurrentView(){
     return currentView
 }
 
-function showMainUI(data){
-
+async function showMainUI(data){
+    await require("./assets/js/mojang").status
     if(!isDev){
-        loggerAutoUpdater.log('Initializing..')
-        ipcRenderer.send('autoUpdateAction', 'initAutoUpdater', ConfigManager.getAllowPrerelease())
+        await loggerAutoUpdater.log('Initializing..')
+        await ipcRenderer.send('autoUpdateAction', 'initAutoUpdater', ConfigManager.getAllowPrerelease())
     }
 
-    prepareSettings(true)
-    updateSelectedServer(data.getServer(ConfigManager.getSelectedServer()))
-    refreshServerStatus()
+    await prepareSettings(true)
+    await updateSelectedServer(data.getServer(ConfigManager.getSelectedServer()))
+    await refreshServerStatus()
     loadDiscord()
     setTimeout(() => {
         document.getElementById('frameBar').style.backgroundColor = 'rgba(0, 0, 0, 0.5)'

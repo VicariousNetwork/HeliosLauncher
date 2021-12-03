@@ -7,7 +7,7 @@
  */
 // Requirements
 const request = require('request')
-const logger  = require('./loggerutil')('%c[Mojang]', 'color: #a02d2a; font-weight: bold')
+const logger = require('./loggerutil')('%c[Mojang]', 'color: #a02d2a; font-weight: bold')
 
 // Constants
 const minecraftAgent = {
@@ -17,42 +17,68 @@ const minecraftAgent = {
 const authpath = 'https://authserver.mojang.com'
 const statuses = [
     {
-        service: 'session.minecraft.net',
+        service: 'session.mojang-multiplayer-session-service',
         status: 'grey',
         name: 'Multiplayer Session Service',
         essential: true
     },
     {
-        service: 'authserver.mojang.com',
+        service: 'mojang-authserver',
         status: 'grey',
         name: 'Authentication Service',
         essential: true
     },
     {
-        service: 'textures.minecraft.net',
+        service: 'minecraft-skins',
         status: 'grey',
         name: 'Minecraft Skins',
         essential: false
     },
     {
-        service: 'api.mojang.com',
+        service: 'mojang-s-public-api',
         status: 'grey',
         name: 'Public API',
         essential: false
     },
-    /*{
-        service: 'minecraft.net',
-        status: 'grey',
-        name: 'Minecraft.net',
-        essential: false
-    },**/
     {
-        service: 'account.mojang.com',
+        service: 'mojang-accounts-website',
         status: 'grey',
         name: 'Mojang Accounts Website',
         essential: false
+    },
+    {
+        service: 'microsoft-o-auth-server',
+        status: 'grey',
+        name: 'Microsoft OAuth Server',
+        essential: true
+    },
+    {
+        service: 'xbox-live-auth-server',
+        status: 'grey',
+        name: 'Xbox Live Auth Server',
+        essential: true
+    },
+    {
+        service: 'xbox-live-gatekeeper', // Server used to give XTokens
+        status: 'grey',
+        name: 'Xbox Live Gatekeeper',
+        essential: true
+    },
+    {
+        service: 'microsoft-minecraft-api',
+        status: 'grey',
+        name: "Minecraft API for Microsoft Accounts",
+        essential: true
+    },
+    {
+        service: 'microsoft-minecraft-profile',
+        status: "grey",
+        name: "Minecraft Profile for Microsoft Accounts",
+        essential: false
     }
 ]
+
+const requestURL = function (serviceURL) { return `https://raw.githubusercontent.com/VicariousNetwork/helios-status-page/master/api/${serviceURL.service}/uptime.json`}
 
 // Functions
 
@@ -64,8 +90,8 @@ const statuses = [
  * @param {string} status A valid status code.
  * @returns {string} The hex color of the status code.
  */
-exports.statusToHex = function(status){
-    switch(status.toLowerCase()){
+ exports.statusToHex = function (status) {
+    switch (status.toLowerCase()) {
         case 'green':
             return '#4DDD19'
         case 'yellow':
@@ -86,37 +112,32 @@ exports.statusToHex = function(status){
  * 
  * @see http://wiki.vg/Mojang_API#API_Status
  */
-exports.status = function(){
-    return new Promise((resolve, reject) => {
-        request.get('https://status.mojang.com/check',
-            {
-                json: true,
-                timeout: 2500
-            },
-            function(error, response, body){
+ exports.status = async function () {
+    return new Promise(async (resolve, reject) => {
+        let data = []
+        for(let i=0; i<statuses.length; i++){
+            request.get(requestURL(statuses[i]),
+                {
+                    json: true,
+                    timeout: 10000
+                },
+                function (error, response, body) {
 
-                if(error || response.statusCode !== 200){
-                    logger.warn('Unable to retrieve Mojang status.')
-                    logger.debug('Error while retrieving Mojang statuses:', error)
-                    //reject(error || response.statusCode)
-                    for(let i=0; i<statuses.length; i++){
-                        statuses[i].status = 'grey'
+                    if (error || response.statusCode !== 200) {
+                        logger.warn('Unable to retrieve Mojang status.')
+                        logger.debug('Error while retrieving Mojang statuses:', error)
+                        data.push(statuses[i])
+                        //reject(error || response.statusCode)
+                        resolve(statuses)
+                    } else {
+                        if (response.body.color == "brightgreen") statuses[i].status = "green"
+                        else statuses[i].status = "red"
+                        data.push(statuses[i])
+                        resolve(statuses)
                     }
-                    resolve(statuses)
-                } else {
-                    for(let i=0; i<body.length; i++){
-                        const key = Object.keys(body[i])[0]
-                        inner:
-                        for(let j=0; j<statuses.length; j++){
-                            if(statuses[j].service === key) {
-                                statuses[j].status = body[i][key]
-                                break inner
-                            }
-                        }
-                    }
-                    resolve(statuses)
-                }
-            })
+                })
+        }
+        return data
     })
 }
 
@@ -161,6 +182,7 @@ exports.authenticate = function(username, password, clientToken, requestUser = t
                     }
                 }
             })
+            setTimeout(resolve, 15000)
     })
 }
 
