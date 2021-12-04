@@ -1028,11 +1028,12 @@ function loadSelectedServerOnModsTab() {
     const serv = DistroManager.getDistribution().getServer(ConfigManager.getSelectedServer())
 
     document.getElementById('settingsSelServContent').innerHTML = `
+        <img class="serverListingImg" src="${serv.getIcon()}"/>
         <div class="serverListingDetails">
-            <img class="serverListingImg" src="${serv.getIcon()}"/>
             <span class="serverListingName">${serv.getName()}</span>
             <span class="serverListingDescription">${serv.getDescription()}</span>
             <div class="serverListingInfo">
+            <div class="serverListingVersion">${serv.getMinecraftVersion()}</div>
                 <div class="serverListingRevision">${serv.getVersion()}</div>
             </div>
         </div>

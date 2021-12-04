@@ -2496,7 +2496,7 @@ input:checked + .toggleSwitchSlider:before {
 }
 #landingContainer > #lower > #left #content {
     position: relative;
-    top: 25px;
+    top: 65px;
     display: inline-flex;
     line-height: 24px;
     left: 50px;
@@ -2514,7 +2514,7 @@ input:checked + .toggleSwitchSlider:before {
     position: relative;
     z-index: 500;
     transition: top 2s ease;
-    top: 10px;
+    top: 50px;
 }
 #landingContainer > #lower > #right {
     position: relative;
@@ -3431,7 +3431,7 @@ input:checked + .toggleSwitchSlider:before {
 /* Main launch content container. */
 #landingContainer > #lower > #right #launch_content {
     position: relative;
-    top: 25px;
+    top: 65px;
     display: inline-flex;
 }
 
@@ -3466,7 +3466,7 @@ input:checked + .toggleSwitchSlider:before {
 /* Launch details main container, hidden until launch processing begins. */
 #launch_details {
     position: relative;
-    top: 25px;
+    top: 65px;
     display: none;
 }
  
