@@ -227,6 +227,13 @@ function updateSelectedAccount(authUser){
 }
 updateSelectedAccount(ConfigManager.getSelectedAccount())
 
+function randomiseBackground() {
+    let backgroundDir = fs.readdirSync(path.join(__dirname, 'assets', 'images', 'backgrounds'))
+    const backgrounds = Array.from(backgroundDir.values())
+    const bkid = backgrounds[Math.floor((Math.random() * backgroundDir.length))]
+    document.body.style.backgroundImage = `url('assets/images/backgrounds/${bkid}')`
+}
+
 // Bind selected server
 function updateSelectedServer(serv){
     if(getCurrentView() === VIEWS.settings){
