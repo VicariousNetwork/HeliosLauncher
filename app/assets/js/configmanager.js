@@ -40,9 +40,9 @@ exports.setDataDirectory = function(dataDirectory){
 }
 
 /**
- * Get the launcher's available server codes. This will be used to load hidden servers.
+ * Get the launcher's available Modpack codes. This will be used to load hidden servers.
  *
- * @returns {string[]} The server codes list that has been put into the launcher's configuration
+ * @returns {string[]} The Modpack codes list that has been put into the launcher's configuration
  */
 exports.getServerCodes = function(){
     return config.settings.launcher.serverCodes

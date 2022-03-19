@@ -2651,7 +2651,7 @@ input:checked + .toggleSwitchSlider:before {
 }
 #landingContainer > #lower > #left #content {
     position: relative;
-    top: 25px;
+    top: 65px;
     display: inline-flex;
     line-height: 24px;
     left: 50px;
@@ -2669,7 +2669,7 @@ input:checked + .toggleSwitchSlider:before {
     position: relative;
     z-index: 500;
     transition: top 2s ease;
-    top: 10px;
+    top: 50px;
 }
 #landingContainer > #lower > #right {
     position: relative;
@@ -3169,7 +3169,7 @@ input:checked + .toggleSwitchSlider:before {
 
 /* User profile name text. */
 #user_text {
-    font-size: 12px;
+    font-size: 18px;
     min-width: 135px;
     font-weight: 900;
     letter-spacing: 1px;
@@ -3216,10 +3216,9 @@ input:checked + .toggleSwitchSlider:before {
 /* Social media icon shared styles. */
 .mediaSVG {
     fill: #ffffff;
-    height: 12px;
     transition: 0.25s ease;
     cursor: pointer;
-    height: 12px;
+    height: 20px;
     width: 25px;
 }
 .mediaSVG:hover,
@@ -3250,7 +3249,7 @@ input:checked + .toggleSwitchSlider:before {
 /* Settings icon colors. */
 #settingsSVG {
     stroke: #ffffff;
-    height: 15px;
+    height: 20px;
 }
 .mediaButton:hover #settingsSVG,
 .mediaButton:focus #settingsSVG,
@@ -3337,7 +3336,7 @@ input:checked + .toggleSwitchSlider:before {
 
 /* Style for a general label on the bottom of the landing view. */
 .bot_label {
-    font-size: 9px;
+    font-size: 15px;
     letter-spacing: 1px;
     font-weight: bold;
     text-shadow: 0px 0px 0px #bebcbb;
@@ -3348,8 +3347,27 @@ input:checked + .toggleSwitchSlider:before {
     height: 25px;
     width: 2px;
     background: rgba(107, 105, 105, 0.7);
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 70px;
+    right: 20px;
+    margin-right: 10px;
+}
+
+.bot_divider_r {
+    height: 25px;
+    width: 2px;
+    background: rgba(107, 105, 105, 0.7);
+    margin-left: 45px;
+    right: 10px;
+    margin-right: 13px;
+}
+
+.bot_divider_rl {
+    height: 25px;
+    width: 2px;
+    background: rgba(107, 105, 105, 0.7);
+    margin-left: 15px;
+    right: 10px;
+    margin-right: 13px;
 }
 
 /* * *
@@ -3365,7 +3383,7 @@ input:checked + .toggleSwitchSlider:before {
 /* Span which displays the player count of the selected server. */
 #player_count {
     color: #949494;
-    font-size: 8px;
+    font-size: 15px;
     font-weight: 900;
     text-shadow: 0px 0px 20px #949494;
     margin-left: 10px;
@@ -3545,7 +3563,7 @@ input:checked + .toggleSwitchSlider:before {
 /* Main launch content container. */
 #landingContainer > #lower > #right #launch_content {
     position: relative;
-    top: 25px;
+    top: 65px;
     display: inline-flex;
 }
 
@@ -3579,7 +3597,7 @@ input:checked + .toggleSwitchSlider:before {
 /* Launch details main container, hidden until launch processing begins. */
 #launch_details {
     position: relative;
-    top: 25px;
+    top: 65px;
     display: none;
 }
  
@@ -3814,6 +3832,9 @@ input:checked + .toggleSwitchSlider:before {
 #accountSelectListScrollable {
     padding: 0px 5px;
     overflow-y: scroll;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 10px;
 }
 #serverSelectListScrollable::-webkit-scrollbar,
 #accountSelectListScrollable::-webkit-scrollbar {
@@ -3887,10 +3908,15 @@ input:checked + .toggleSwitchSlider:before {
 }
 
 /* Add spacing between server listings. */
-#serverSelectListScrollable > .serverListing:not(:first-child):not(:last-child),
+#serverSelectListScrollable > .serverListing
 #accountSelectListScrollable > .accountListing:not(:first-child):not(:last-child) {
     margin: 5px 0px;
 }
+
+#serverSelectListScrollable > .serverListing, #accountSelectListScrollable > .accountListing:not(:first-child):not(:last-child) {
+    margin: 5px 0px;
+}
+
 #serverSelectListScrollable > .serverListing:first-child,
 #accountSelectListScrollable > .accountListing:first-child {
     margin-bottom: 5px;
@@ -4015,8 +4041,9 @@ input:checked + .toggleSwitchSlider:before {
     color: white;
     font-family: 'Avenir Medium';
     font-weight: bold;
+    font-size: 16px;
     border-radius: 2px;
-    padding: 0px 8.1px;
+    padding: 0px 9.1px;
     cursor: pointer;
     transition: 0.25s ease;
     min-height: 20.67px;
@@ -4038,7 +4065,7 @@ input:checked + .toggleSwitchSlider:before {
 #serverSelectCancel,
 #accountSelectCancel {
     font-weight: bold;
-    font-size: 10px;
+    font-size: 14px;
     text-decoration: none;
     padding-top: 2.5px;
     color: rgba(202, 202, 202, 0.75);
@@ -4046,6 +4073,8 @@ input:checked + .toggleSwitchSlider:before {
     background: none;
     border: none;
     outline: none;
+    cursor: pointer;
+    padding-top: 6px;
     cursor: pointer;
 }
 #serverSelectCancel:hover,

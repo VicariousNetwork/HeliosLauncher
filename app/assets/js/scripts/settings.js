@@ -6,8 +6,6 @@ const { JavaGuard } = require('./assets/js/assetguard')
 const DropinModUtil  = require('./assets/js/dropinmodutil')
 const { MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR } = require('./assets/js/ipcconstants')
 
-const loggerSettings = LoggerUtil('%c[Settings]', 'color: #353232; font-weight: bold')
-
 const settingsState = {
     invalid: new Set()
 }
@@ -428,7 +426,7 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
 })
 
 /**
- * Binds the functionality within the server codes section of the launcher settings
+ * Binds the functionality within the Modpack codes section of the launcher settings
  */
 function bindServerCodeButtons(){
     // Sets up the onclick listeners for the button to add codes
@@ -915,7 +913,7 @@ function resolveDropinModsForUI(){
 }
 
 function resolveServerCodesForUI(){
-    /* Server Codes */
+    /* Modpack Codes */
     let servCodes = ''
     for(let servCode of ConfigManager.getServerCodes()){
         const servs = DistroManager.getDistribution().getServersFromCode(servCode)
@@ -1156,11 +1154,11 @@ function loadSelectedServerOnModsTab(){
     const serv = DistroManager.getDistribution().getServer(ConfigManager.getSelectedServer())
 
     document.getElementById('settingsSelServContent').innerHTML = `
-        <img class="serverListingImg" src="${serv.getIcon()}"/>
         <div class="serverListingDetails">
             <span class="serverListingName">${serv.getName()}</span>
             <span class="serverListingDescription">${serv.getDescription()}</span>
             <div class="serverListingInfo">
+                <img class="serverListingImg" src="${serv.getIcon()}"/>
                 <div class="serverListingVersion">${serv.getMinecraftVersion()}</div>
                 <div class="serverListingRevision">${serv.getVersion()}</div>
                 ${serv.isMainServer() ? `<div class="serverListingStarWrapper">
