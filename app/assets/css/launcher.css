@@ -2747,7 +2747,7 @@ input:checked + .toggleSwitchSlider:before {
 
 /* News article title styles. */
 #newsArticleTitle {
-    font-size: 18px;
+    font-size: 25px;
     font-weight: bold;
     font-family: 'Avenir Medium';
     color: white;
@@ -2782,7 +2782,7 @@ input:checked + .toggleSwitchSlider:before {
 #newsArticleDate,
 #newsArticleAuthor {
     display: inline-block;
-    font-size: 10px;
+    font-size: 16px;
     padding: 0px 5px;
     font-weight: bold;
     border-radius: 2px;
@@ -3104,6 +3104,19 @@ input:checked + .toggleSwitchSlider:before {
 /* * *
 * Landing View (Bottom Styles) | Right Content
 * * */
+
+#refreshSVG {
+    fill: #ffffff;
+    height: 15px;
+}
+#refreshSVG:hover {
+    height: 25px;
+    fill: #ffffff;
+}
+
+#refreshMediaButton[inprogress] #refreshSVG {
+    animation: spin 0.8s infinite;
+}
 
 /*  Wrapper container for top, right content. */
 #rightContainer {
