@@ -2828,7 +2828,7 @@ input:checked + .toggleSwitchSlider:before {
 
 /* Article content styles. */
 #newsArticleContentScrollable {
-    font-size: 12px;
+    font-size: 18px;
     overflow-y: scroll;
     height: 100%;
     padding: 0px 15px 0px 15px;
