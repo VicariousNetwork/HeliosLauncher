@@ -3,8 +3,10 @@ const os     = require('os')
 const semver = require('semver')
 
 const { JavaGuard } = require('./assets/js/assetguard')
-const DropinModUtil  = require('./assets/js/dropinmodutil')
+const DropinModUtil = require('./assets/js/dropinmodutil')
 const { MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR } = require('./assets/js/ipcconstants')
+
+const settingsLogger        = require('./assets/js/loggerutil')('%c[Settings]', 'color: #353232; font-weight: bold')
 
 const settingsState = {
     invalid: new Set()
@@ -426,9 +428,9 @@ ipcRenderer.on(MSFT_OPCODE.REPLY_LOGIN, (_, ...arguments_) => {
 })
 
 /**
- * Binds the functionality within the Modpack codes section of the launcher settings
+ * Binds the functionality within the server codes section of the launcher settings
  */
-function bindServerCodeButtons(){
+ function bindServerCodeButtons(){
     // Sets up the onclick listeners for the button to add codes
     document.getElementById('settingsAddServerCode').onclick = () => {
         for(let ele of document.getElementsByClassName('settingsInputServerCodeVal')){
@@ -437,10 +439,10 @@ function bindServerCodeButtons(){
             if(!ConfigManager.getServerCodes().includes(code) && code){
                 ConfigManager.getServerCodes().push(code)
                 ConfigManager.save()
-                loggerSettings.log('Added server code to configuration and saved it')
+                settingsLogger.log('Added server code to configuration and saved it')
                 prepareLauncherTab()
             } else {
-                loggerSettings.log('Server code already exists or is empty, not adding.')
+                settingsLogger.log('Server code already exists or is empty, not adding.')
             }
         }
     }
@@ -454,11 +456,11 @@ function bindServerCodeButtons(){
                 if(ConfigManager.getServerCodes().includes(code)){
                     ConfigManager.getServerCodes().splice(ConfigManager.getServerCodes().indexOf(code), 1)
                     ConfigManager.save()
-                    loggerSettings.log('Added removed code from configuration and saved it')
+                    settingsLogger.log('Added removed code from configuration and saved it')
                     prepareLauncherTab()
                 }
             }
-            loggerSettings.log('Server code doesnt exist!, not removing.')
+            settingsLogger.log('Server code doesnt exist!, not removing.')
         }
     })
 }
@@ -705,7 +707,7 @@ function prepareAccountsTab() {
 /**
  * Prepare the accounts tab for display.
  */
-function prepareLauncherTab() {
+ function prepareLauncherTab() {
     resolveServerCodesForUI()
     bindServerCodeButtons()
 }
@@ -913,7 +915,7 @@ function resolveDropinModsForUI(){
 }
 
 function resolveServerCodesForUI(){
-    /* Modpack Codes */
+    /* Server Codes */
     let servCodes = ''
     for(let servCode of ConfigManager.getServerCodes()){
         const servs = DistroManager.getDistribution().getServersFromCode(servCode)
@@ -946,10 +948,10 @@ function resolveServerCodesForUI(){
         const code = ele.getAttribute('code')
         const servs = DistroManager.getDistribution().getServersFromCode(code)
         const valid = servs && servs.length
-        loggerSettings.log('valid: ' + valid)
+        settingsLogger.log('valid: ' + valid)
         if(valid){
             for(let serv of servs){
-                loggerSettings.log('server: ' + serv.getName())
+                settingsLogger.log('server: ' + serv.getName())
                 servNames +=
                     `
                     <span class="settingsServerCodeServerName">${serv.getName()}</span> 
@@ -965,6 +967,7 @@ function resolveServerCodesForUI(){
         ele.innerHTML = servNames
     }
 }
+
 /**
  * Bind the remove button for each loaded drop-in mod.
  */

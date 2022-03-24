@@ -397,14 +397,13 @@ class Server {
     isMainServer(){
         return this.mainServer
     }
-
+    
     /**
      * @returns {string} The server code for this server
      */
-    getServerCode(){
+     getServerCode(){
         return this.serverCode
     }
-
     /**
      * @returns {boolean} Whether or not the server is autoconnect.
      * by default.
@@ -514,7 +513,7 @@ class DistroIndex {
      *
      * @returns {Server[]} The server configuration with the given ID or null.
      */
-    getServersFromCode(code){
+     getServersFromCode(code){
         let servs = []
         for(let serv of this.servers){
             if(serv.serverCode === code){
