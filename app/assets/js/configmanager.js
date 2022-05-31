@@ -21,23 +21,6 @@ exports.getLauncherDirectory = function(){
 }
 
 /**
- * Retrieve the ETag version for the current stored distribution file
- *
- * @returns {string} The absolute path of the launcher directory.
- */
- exports.getDistributionVersion = function(){
-    return config.distributionVersion
-}
-
-/**
- * Stores the current distribution ETag version into the configuration
- *
- * @returns {string} The absolute path of the launcher directory.
- */
-exports.setDistributionVersion = function(version){
-    config.distributionVersion = version
-}
-/**
  * Get the launcher's data directory. This is where all files related
  * to game launch are installed (common, instances, java, etc).
  *
@@ -61,7 +44,7 @@ exports.setDataDirectory = function(dataDirectory){
  *
  * @returns {string[]} The server codes list that has been put into the launcher's configuration
  */
-exports.getServerCodes = function(){
+ exports.getServerCodes = function(){
     return config.settings.launcher.serverCodes
 }
 
@@ -85,12 +68,13 @@ exports.getAbsoluteMinRAM = function(){
 
 exports.getAbsoluteMaxRAM = function(){
     const mem = os.totalmem()
-    return Math.floor((mem/1000000000))
+    const gT16 = mem-16000000000
+    return Math.floor((mem-1000000000-(gT16 > 0 ? (Number.parseInt(gT16/8) + 16000000000/4) : mem/4))/1000000000)
 }
 
 function resolveMaxRAM(){
     const mem = os.totalmem()
-    return mem >= 16000000000 ? '8G' : (mem >= 8000000000 ? '6G' : (mem >= 6000000000 ? '4G' : '2G'))
+    return mem >= 8000000000 ? '4G' : (mem >= 6000000000 ? '3G' : '2G')
 }
 
 function resolveMinRAM(){
@@ -113,21 +97,18 @@ const DEFAULT_CONFIG = {
                 '-XX:+UseConcMarkSweepGC',
                 '-XX:+CMSIncrementalMode',
                 '-XX:-UseAdaptiveSizePolicy',
-                '-Xmn128M',
-                '-Dfml.loginTimeout=180'
+                '-Xmn128M'
             ],
         },
         game: {
-            resWidth: 854,
-            resHeight: 480,
+            resWidth: 1280,
+            resHeight: 720,
             fullscreen: false,
             autoConnect: true,
-            launchDetached: true,
-            consoleOnLaunch: false
+            launchDetached: true
         },
         launcher: {
             allowPrerelease: false,
-            discordIntegration: true,
             dataDirectory: dataPath,
             serverCodes: []
         }
@@ -138,12 +119,10 @@ const DEFAULT_CONFIG = {
         dismissed: false
     },
     clientToken: null,
-    distributionVersion: null,
     selectedServer: null, // Resolved
     selectedAccount: null,
     authenticationDatabase: {},
-    modConfigurations: [],
-    microsoftAuth: {}
+    modConfigurations: []
 }
 
 let config = null
@@ -358,15 +337,38 @@ exports.getAuthAccount = function(uuid){
 }
 
 /**
- * Update the access token of an authenticated account.
+ * Update the access token of an authenticated mojang account.
  * 
  * @param {string} uuid The uuid of the authenticated account.
  * @param {string} accessToken The new Access Token.
  * 
  * @returns {Object} The authenticated account object created by this action.
  */
-exports.updateAuthAccount = function(uuid, accessToken){
+exports.updateMojangAuthAccount = function(uuid, accessToken){
     config.authenticationDatabase[uuid].accessToken = accessToken
+    config.authenticationDatabase[uuid].type = 'mojang' // For gradual conversion.
+    return config.authenticationDatabase[uuid]
+}
+
+/**
+ * Adds an authenticated mojang account to the database to be stored.
+ * 
+ * @param {string} uuid The uuid of the authenticated account.
+ * @param {string} accessToken The accessToken of the authenticated account.
+ * @param {string} username The username (usually email) of the authenticated account.
+ * @param {string} displayName The in game name of the authenticated account.
+ * 
+ * @returns {Object} The authenticated account object created by this action.
+ */
+exports.addMojangAuthAccount = function(uuid, accessToken, username, displayName){
+    config.selectedAccount = uuid
+    config.authenticationDatabase[uuid] = {
+        type: 'mojang',
+        accessToken,
+        username: username.trim(),
+        uuid: uuid.trim(),
+        displayName: displayName.trim()
+    }
     return config.authenticationDatabase[uuid]
 }
 
@@ -382,34 +384,12 @@ exports.updateAuthAccount = function(uuid, accessToken){
  * 
  * @returns {Object} The authenticated account object created by this action.
  */
- exports.updateAuthAccount = function (uuid, accessToken, msAccessToken, msRefreshToken, msExpires, mcExpires) {
+exports.updateMicrosoftAuthAccount = function(uuid, accessToken, msAccessToken, msRefreshToken, msExpires, mcExpires) {
     config.authenticationDatabase[uuid].accessToken = accessToken
     config.authenticationDatabase[uuid].expiresAt = mcExpires
     config.authenticationDatabase[uuid].microsoft.access_token = msAccessToken
     config.authenticationDatabase[uuid].microsoft.refresh_token = msRefreshToken
-    config.authenticationDatabase[uuid].microsoft.expires_at = msRefreshToken
-    return config.authenticationDatabase[uuid]
-}
-
-/**
- * Adds an authenticated mojang account to the database to be stored.
- * 
- * @param {string} uuid The uuid of the authenticated account.
- * @param {string} accessToken The accessToken of the authenticated account.
- * @param {string} username The username (usually email) of the authenticated account.
- * @param {string} displayName The in game name of the authenticated account.
- * 
- * @returns {Object} The authenticated account object created by this action.
- */
-exports.addAuthAccount = function(uuid, accessToken, username, displayName){
-    config.selectedAccount = uuid
-    config.authenticationDatabase[uuid] = {
-        accessToken,
-        username: username.trim(),
-        uuid: uuid.trim(),
-        displayName: displayName.trim(),
-        type: 'mojang'
-    }
+    config.authenticationDatabase[uuid].microsoft.expires_at = msExpires
     return config.authenticationDatabase[uuid]
 }
 
@@ -426,15 +406,15 @@ exports.addAuthAccount = function(uuid, accessToken, username, displayName){
  * 
  * @returns {Object} The authenticated account object created by this action.
  */
-exports.addMsAuthAccount = function (uuid, accessToken, name, mcExpires, msAccessToken, msRefreshToken, msExpires) {
+exports.addMicrosoftAuthAccount = function(uuid, accessToken, name, mcExpires, msAccessToken, msRefreshToken, msExpires) {
     config.selectedAccount = uuid
     config.authenticationDatabase[uuid] = {
+        type: 'microsoft',
         accessToken,
         username: name.trim(),
         uuid: uuid.trim(),
         displayName: name.trim(),
         expiresAt: mcExpires,
-        type: 'microsoft',
         microsoft: {
             access_token: msAccessToken,
             refresh_token: msRefreshToken,
@@ -759,25 +739,6 @@ exports.setLaunchDetached = function(launchDetached){
     config.settings.game.launchDetached = launchDetached
 }
 
-/**
- * Check if the game should open the devtools console on launch
- *
- * @param {boolean} def Optional. If true, the default value will be returned.
- * @returns {boolean} Whether or not to open the devtools console on launch
- */
- exports.getConsoleOnLaunch = function(def = false){
-    return !def ? config.settings.game.consoleOnLaunch : DEFAULT_CONFIG.settings.game.consoleOnLaunch
-}
-
-/**
- * Change the status of whether or not the devtools console should open on launch
- *
- * @param {boolean} consoleOnLaunch whether or not to open the devtools console on launch
- */
-exports.setConsoleOnLaunch = function(consoleOnLaunch){
-    config.settings.game.consoleOnLaunch = consoleOnLaunch
-}
-
 // Launcher Settings
 
 /**
@@ -791,29 +752,10 @@ exports.getAllowPrerelease = function(def = false){
 }
 
 /**
- * Change the status of whether or not the launcher should download prerelease versions.
+ * Change the status of Whether or not the launcher should download prerelease versions.
  * 
  * @param {boolean} launchDetached Whether or not the launcher should download prerelease versions.
  */
 exports.setAllowPrerelease = function(allowPrerelease){
     config.settings.launcher.allowPrerelease = allowPrerelease
-}
-
-/**
- * Check if the launcher should enable discord presence features
- *
- * @param {boolean} def Optional. If true, the default value will be returned.
- * @returns {boolean} Whether or not the launcher should enable discord presence features
- */
-exports.getDiscordIntegration = function(def = false){
-    return !def ? config.settings.launcher.discordIntegration : DEFAULT_CONFIG.settings.launcher.discordIntegration
-}
-
-/**
- * Change the status of whether or not the launcher should denable discord presence features
- *
- * @param {boolean} discordIntegration Whether or not the launcher should enable discord presence features
- */
-exports.setDiscordIntegration = function(discordIntegration){
-    config.settings.launcher.discordIntegration = discordIntegration
 }

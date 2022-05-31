@@ -16,9 +16,11 @@ let fatalStartupError = false
 // Mapping of each view to their container IDs.
 const VIEWS = {
     landing: '#landingContainer',
+    loginOptions: '#loginOptionsContainer',
     login: '#loginContainer',
     settings: '#settingsContainer',
-    welcome: '#welcomeContainer'
+    welcome: '#welcomeContainer',
+    waiting: '#waitingContainer'
 }
 
 // The currently shown view container.
@@ -55,20 +57,19 @@ function getCurrentView(){
     return currentView
 }
 
-async function showMainUI(data){
-    await require("./assets/js/mojang").status
+function showMainUI(data){
+
     if(!isDev){
-        await loggerAutoUpdater.log('Initializing..')
-        await ipcRenderer.send('autoUpdateAction', 'initAutoUpdater', ConfigManager.getAllowPrerelease())
+        loggerAutoUpdater.log('Initializing..')
+        ipcRenderer.send('autoUpdateAction', 'initAutoUpdater', ConfigManager.getAllowPrerelease())
     }
 
-    await prepareSettings(true)
-    await updateSelectedServer(data.getServer(ConfigManager.getSelectedServer()))
-    await refreshServerStatus()
-    loadDiscord()
+    prepareSettings(true)
+    updateSelectedServer(data.getServer(ConfigManager.getSelectedServer()))
+    refreshServerStatus()
     setTimeout(() => {
         document.getElementById('frameBar').style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
-        randomiseBackground()
+        document.body.style.backgroundImage = `url('assets/images/backgrounds/${document.body.getAttribute('bkid')}.jpg')`
         $('#main').show()
 
         const isLoggedIn = Object.keys(ConfigManager.getAuthAccounts()).length > 0
@@ -82,30 +83,16 @@ async function showMainUI(data){
         if(ConfigManager.isFirstLaunch()){
             currentView = VIEWS.welcome
             $(VIEWS.welcome).fadeIn(1000)
-            if(hasRPC){
-                DiscordWrapper.updateDetails('Welcome and continue.')
-                DiscordWrapper.updateState('Launcher Setup')
-            }
         } else {
             if(isLoggedIn){
                 currentView = VIEWS.landing
                 $(VIEWS.landing).fadeIn(1000)
-                if(hasRPC && !ConfigManager.isFirstLaunch()){
-                    if(ConfigManager.getSelectedServer()){
-                        const serv = DistroManager.getDistribution().getServer(ConfigManager.getSelectedServer())
-                        DiscordWrapper.updateDetails('Ready to Play!')
-                        DiscordWrapper.updateState('Server: ' + serv.getName())
-                    } else {
-                        DiscordWrapper.updateDetails('Landing Screen...')
-                    }
-                }
             } else {
-                currentView = VIEWS.login
-                $(VIEWS.login).fadeIn(1000)
-                if(hasRPC){
-                    DiscordWrapper.updateDetails('Adding an Account...')
-                    DiscordWrapper.clearState()
-                }
+                loginOptionsCancelEnabled(false)
+                loginOptionsViewOnLoginSuccess = VIEWS.landing
+                loginOptionsViewOnLoginCancel = VIEWS.loginOptions
+                currentView = VIEWS.loginOptions
+                $(VIEWS.loginOptions).fadeIn(1000)
             }
         }
 
@@ -128,17 +115,14 @@ function showFatalStartupError(){
             document.getElementById('overlayContainer').style.background = 'none'
             setOverlayContent(
                 'Fatal Error: Unable to Load Distribution Index',
-                'A connection could not be established to our servers to download the distribution index. No local copies were available to load. <br><br>The distribution index is an essential file which provides the latest server information. The launcher is unable to start without it. Ensure you are connected to the internet and relaunch the application. <br><br>It is very possible that the launcher has updated and changed the location for the distribution index file. We would recommend installing the latest version of the launcher from our releases page. <br><br>If you continue to have issues, please contact us on the Vicarious Network Discord server.',
-                'Download Latest Version',
-                'Join our Discord'
+                'A connection could not be established to our servers to download the distribution index. No local copies were available to load. <br><br>The distribution index is an essential file which provides the latest server information. The launcher is unable to start without it. Ensure you are connected to the internet and relaunch the application.',
+                'Close'
             )
             setOverlayHandler(() => {
-                shell.openExternal('https://github.com/VicariousNetwork/VNLauncher/releases/latest')
+                const window = remote.getCurrentWindow()
+                window.close()
             })
-            setDismissHandler(() => {
-                shell.openExternal('https://vcnet.work/discord')
-            })
-            toggleOverlay(true, true)
+            toggleOverlay(true)
         })
     }, 750)
 }
@@ -323,17 +307,17 @@ function mergeModConfiguration(o, n, nReq = false){
     return n
 }
 
-//function refreshDistributionIndex(remote, onSuccess, onError){
-//    if(remote){
-//        DistroManager.pullRemote()
-//            .then(onSuccess)
-//            .catch(onError)
-//    } else {
-//        DistroManager.pullLocal()
-//            .then(onSuccess)
-//            .catch(onError)
-//    }
-//}
+function refreshDistributionIndex(remote, onSuccess, onError){
+    if(remote){
+        DistroManager.pullRemote()
+            .then(onSuccess)
+            .catch(onError)
+    } else {
+        DistroManager.pullLocal()
+            .then(onSuccess)
+            .catch(onError)
+    }
+}
 
 async function validateSelectedAccount(){
     const selectedAcc = ConfigManager.getSelectedAccount()
@@ -350,24 +334,46 @@ async function validateSelectedAccount(){
                 'Select Another Account'
             )
             setOverlayHandler(() => {
-                document.getElementById('loginUsername').value = selectedAcc.username
-                validateEmail(selectedAcc.username)
-                loginViewOnSuccess = getCurrentView()
-                loginViewOnCancel = getCurrentView()
-                if(accLen > 0){
-                    loginViewCancelHandler = () => {
-                        ConfigManager.addAuthAccount(selectedAcc.uuid, selectedAcc.accessToken, selectedAcc.username, selectedAcc.displayName)
+
+                const isMicrosoft = selectedAcc.type === 'microsoft'
+
+                if(isMicrosoft) {
+                    // Empty for now
+                } else {
+                    // Mojang
+                    // For convenience, pre-populate the username of the account.
+                    document.getElementById('loginUsername').value = selectedAcc.username
+                    validateEmail(selectedAcc.username)
+                }
+                
+                loginOptionsViewOnLoginSuccess = getCurrentView()
+                loginOptionsViewOnLoginCancel = VIEWS.loginOptions
+
+                if(accLen > 0) {
+                    loginOptionsViewOnCancel = getCurrentView()
+                    loginOptionsViewCancelHandler = () => {
+                        if(isMicrosoft) {
+                            ConfigManager.addMicrosoftAuthAccount(
+                                selectedAcc.uuid,
+                                selectedAcc.accessToken,
+                                selectedAcc.username,
+                                selectedAcc.expiresAt,
+                                selectedAcc.microsoft.access_token,
+                                selectedAcc.microsoft.refresh_token,
+                                selectedAcc.microsoft.expires_at
+                            )
+                        } else {
+                            ConfigManager.addMojangAuthAccount(selectedAcc.uuid, selectedAcc.accessToken, selectedAcc.username, selectedAcc.displayName)
+                        }
                         ConfigManager.save()
                         validateSelectedAccount()
                     }
-                    loginCancelEnabled(true)
+                    loginOptionsCancelEnabled(true)
+                } else {
+                    loginOptionsCancelEnabled(false)
                 }
                 toggleOverlay(false)
-                switchView(getCurrentView(), VIEWS.login)
-                if(hasRPC){
-                    DiscordWrapper.updateDetails('Adding an Account...')
-                    DiscordWrapper.clearState()
-                }
+                switchView(getCurrentView(), VIEWS.loginOptions)
             })
             setDismissHandler(() => {
                 if(accLen > 1){
@@ -440,26 +446,5 @@ ipcRenderer.on('distributionIndexDone', (event, res) => {
         } else {
             rscShouldLoad = true
         }
-    }
-})
-
-
-ipcRenderer.on('cachedDistributionNotification', (event, res) => {
-    if(res) {
-        setTimeout(() => {
-            setOverlayContent(
-                'Warning: Cached Distribution Startup',
-                'We were unable to grab the latest server information from the internet upon startup, so we have used a previously stored version instead.<br><br>This is not recommended, and you should restart your client to fix this to avoid your modpack files being out of date. If you wish to continue using the launcher, you can try again at any time by pressing the refresh button on the landing screen.<br><br>If this continues to occur, and you are not too sure why, come and see us on Discord!',
-                'Understood',
-                'Join our Discord'
-            )
-            setOverlayHandler(() => {
-                toggleOverlay(false)
-            })
-            setDismissHandler(() => {
-                shell.openExternal('https://vcnet.work/discord')
-            })
-            toggleOverlay(true, true)
-        }, 2000)
     }
 })

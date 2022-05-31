@@ -1,13 +1,13 @@
 {
   "name": "vicariousnetworklauncher",
-  "version": "1.2.6",
+  "version": "1.8.0",
   "productName": "Vicarious Network Launcher",
   "description": "Modded Minecraft Launcher",
-  "author": "SirOMGitsYOU / Peter (https://github.com/VicaiousNetwork/)",
-  "license": "MIT",
-  "homepage": "https://github.com/VicariousNetwork/VNLauncher",
+  "author": "Daniel Scalzi (https://github.com/dscalzi/)",
+  "license": "UNLICENSED",
+  "homepage": "https://github.com/dscalzi/HeliosLauncher",
   "bugs": {
-    "url": "https://github.com/VicariousNetwork/VNLauncher/issues"
+    "url": "https://github.com/dscalzi/HeliosLauncher/issues"
   },
   "private": true,
   "main": "index.js",
@@ -23,17 +23,17 @@
     "node": "16.x.x"
   },
   "dependencies": {
-    "@electron/remote": "^2.0.1",
+    "@electron/remote": "^2.0.8",
     "adm-zip": "^0.5.9",
-    "async": "^3.2.1",
-    "discord-rpc": "^3.2.0",
+    "async": "^3.2.3",
+    "discord-rpc-patch": "^4.0.1",
     "ejs": "^3.1.6",
     "ejs-electron": "^2.1.1",
-    "electron-updater": "^4.3.9",
-    "fs-extra": "^10.0.0",
+    "electron-updater": "^4.6.5",
+    "fs-extra": "^10.0.1",
     "github-syntax-dark": "^0.5.0",
-    "helios-core": "^0.1.0-alpha.3",
-    "got": "^11.8.2",
+    "got": "^11.8.3",
+    "helios-core": "~0.1.0",
     "jquery": "^3.6.0",
     "node-stream-zip": "^1.15.0",
     "request": "^2.88.2",
@@ -42,12 +42,12 @@
     "winreg": "^1.2.4"
   },
   "devDependencies": {
-    "electron": "^15.2.0",
-    "electron-builder": "^22.13.1",
-    "eslint": "^8.0.1"
+    "electron": "^17.2.0",
+    "electron-builder": "^22.14.13",
+    "eslint": "^8.11.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/VicariousNetwork/VNLauncher.git"
+    "url": "git+https://github.com/dscalzi/HeliosLauncher.git"
   }
 }

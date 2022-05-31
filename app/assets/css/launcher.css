@@ -34,6 +34,11 @@ body, html, div {
     padding: 0px;
 }
 
+/* Reset p presets. */
+p {
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+}
 
 /* Set default font and color. */
 body, button {
@@ -217,6 +222,7 @@ body, button {
     align-items: center;
     height: 100%;
     width: 100%;
+    background: rgba(0, 0, 0, 0.50);
 }
 
 #welcomeContent {
@@ -608,7 +614,8 @@ body, button {
     font-weight: bold;
     letter-spacing: 2px;
     border: none;
-    margin: 15px 0px;
+    padding: 15px 5px;
+    margin: 10px 0px;
     cursor: pointer;
     position: relative;
     right: -20px;
@@ -682,21 +689,6 @@ body, button {
     border-radius: 50%;
     width: 16px;
     height: 16px;
-}
-.circle-loader-big {
-    margin:auto;
-    border: 5px solid rgba(255, 255, 255, 0.5);
-    border-left-color: #ffffff;
-    animation-name: loader-spin;
-    animation-duration: 1s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-    position: relative;
-    display: block;
-    align-self: center;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
 }
 .load-complete {
     animation: none;
@@ -868,32 +860,6 @@ body, button {
     transform: rotate(45deg);
 }
 
-#loginMSButton {
-    background-color: #006EFA;
-    border: none;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    font-size: 20px;
-    display: flex;
-    padding: 16px;
-    gap: 15px;
-    font-weight: bold;
-    align-items: center;
-    cursor: pointer;
-}
-#loginMSButton:disabled {
-    color: rgba(255, 255, 255, 0.75);
-    pointer-events: none;
-}
-#loginMSButton:hover,
-#loginMSButton:focus {
-    text-shadow: 0px 0px 20px #fff;
-    outline: none;
-}
-#loginMSButton:active {
-    color: #c7c7c7;
-    text-shadow:  0px 0px 20px #c7c7c7;
-}
 /*
 #login_filter {
     height: calc(100% - 22px);
@@ -906,6 +872,175 @@ body, button {
     background-size: cover;
 }
 */
+
+/*******************************************************************************
+ *                                                                             *
+ * Waiting View (waiting.ejs)                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+#waitingContainer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    transition: filter 0.25s ease;
+    background: rgba(0, 0, 0, 0.50);
+}
+
+#waitingContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    top: -10%;
+    position: relative;
+}
+
+.waitingSpinner:before {
+    transform: rotateX(60deg) rotateY(45deg) rotateZ(45deg);
+    animation: 750ms rotateBefore infinite linear reverse;
+}
+.waitingSpinner:after {
+    transform: rotateX(240deg) rotateY(45deg) rotateZ(45deg);
+    animation: 750ms rotateAfter infinite linear;
+}
+.waitingSpinner:before,
+.waitingSpinner:after {
+    box-sizing: border-box;
+    content: '';
+    display: block;
+    position: fixed;
+    top: calc(50% - 5em);
+    /* left: 50%; */
+    margin-top: -5em;
+    margin-left: -5em;
+    width: 10em;
+    height: 10em;
+    transform-style: preserve-3d;
+    transform-origin: 50%;
+    transform: rotateY(50%);
+    perspective-origin: 50% 50%;
+    perspective: 340px;
+    background-size: 10em 10em;
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+Cjxzdmcgd2lkdGg9IjI2NnB4IiBoZWlnaHQ9IjI5N3B4IiB2aWV3Qm94PSIwIDAgMjY2IDI5NyIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczpza2V0Y2g9Imh0dHA6Ly93d3cuYm9oZW1pYW5jb2RpbmcuY29tL3NrZXRjaC9ucyI+CiAgICA8dGl0bGU+c3Bpbm5lcjwvdGl0bGU+CiAgICA8ZGVzY3JpcHRpb24+Q3JlYXRlZCB3aXRoIFNrZXRjaCAoaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoKTwvZGVzY3JpcHRpb24+CiAgICA8ZGVmcz48L2RlZnM+CiAgICA8ZyBpZD0iUGFnZS0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBza2V0Y2g6dHlwZT0iTVNQYWdlIj4KICAgICAgICA8cGF0aCBkPSJNMTcxLjUwNzgxMywzLjI1MDAwMDM4IEMyMjYuMjA4MTgzLDEyLjg1NzcxMTEgMjk3LjExMjcyMiw3MS40OTEyODIzIDI1MC44OTU1OTksMTA4LjQxMDE1NSBDMjE2LjU4MjAyNCwxMzUuODIwMzEgMTg2LjUyODQwNSw5Ny4wNjI0OTY0IDE1Ni44MDA3NzQsODUuNzczNDM0NiBDMTI3LjA3MzE0Myw3NC40ODQzNzIxIDc2Ljg4ODQ2MzIsODQuMjE2MTQ2MiA2MC4xMjg5MDY1LDEwOC40MTAxNTMgQy0xNS45ODA0Njg1LDIxOC4yODEyNDcgMTQ1LjI3NzM0NCwyOTYuNjY3OTY4IDE0NS4yNzczNDQsMjk2LjY2Nzk2OCBDMTQ1LjI3NzM0NCwyOTYuNjY3OTY4IC0yNS40NDkyMTg3LDI1Ny4yNDIxOTggMy4zOTg0Mzc1LDEwOC40MTAxNTUgQzE2LjMwNzA2NjEsNDEuODExNDE3NCA4NC43Mjc1ODI5LC0xMS45OTIyOTg1IDE3MS41MDc4MTMsMy4yNTAwMDAzOCBaIiBpZD0iUGF0aC0xIiBmaWxsPSIjZmZmZmZmIiBza2V0Y2g6dHlwZT0iTVNTaGFwZUdyb3VwIj48L3BhdGg+CiAgICA8L2c+Cjwvc3ZnPg==);
+}
+
+#waitingTextContainer {
+    position: fixed;
+    top: 50%;
+}
+
+@keyframes rotateBefore {
+    from {
+      transform: rotateX(60deg) rotateY(45deg) rotateZ(0deg);
+    }
+    to {
+      transform: rotateX(60deg) rotateY(45deg) rotateZ(-360deg);
+    }
+}
+
+@keyframes rotateAfter {
+    from {
+      transform: rotateX(240deg) rotateY(45deg) rotateZ(0deg);
+    }
+    to {
+      transform: rotateX(240deg) rotateY(45deg) rotateZ(360deg);
+    }
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Login Options View (loginOptions.ejs)                                       *
+ *                                                                             *
+ ******************************************************************************/
+
+#loginOptionsContainer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    transition: filter 0.25s ease;
+    background: rgba(0, 0, 0, 0.50);
+}
+
+#loginOptionsContent {
+    border-radius: 3px;
+    position: relative;
+    top: -5%;
+}
+
+.loginOptionsMainContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loginOptionActions {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+.loginOptionButtonContainer {
+    width: 16em;
+}
+
+.loginOptionButton {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    border-radius: 3px;
+    height: 50px;
+    width: 100%;
+    text-align: left;
+    padding: 0px 25px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.25s ease;
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
+}
+.loginOptionButton:hover,
+.loginOptionButton:focus {
+    background: rgba(54, 54, 54, 0.25);
+    text-shadow: 0px 0px 20px white;
+}
+
+#loginOptionCancelContainer {
+    position: absolute;
+    bottom: -100px;
+}
+
+#loginOptionCancelButton {
+    background: none;
+    border: none;
+    padding: 2px 0px;
+    font-size: 16px;
+    font-weight: bold;
+    color: lightgrey;
+    cursor: pointer;
+    outline: none;
+    transition: 0.25s ease;
+}
+#loginOptionCancelButton:hover,
+#loginOptionCancelButton:focus {
+    text-shadow: 0px 0px 20px lightgrey;
+}
+#loginOptionCancelButton:active {
+    text-shadow: 0px 0px 20px rgba(211, 211, 211, 0.75);
+    color: rgba(211, 211, 211, 0.75);
+}
+#loginOptionCancelButton:disabled {
+    color: rgba(211, 211, 211, 0.75);
+    pointer-events: none;
+}
+
 
 /*******************************************************************************
  *                                                                             *
@@ -1461,45 +1596,65 @@ input:checked + .toggleSwitchSlider:before {
 * Settings View (Account Tab)
 * * */
 
-/* Add account button styles. */
-#settingsAddAccount {
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(126, 126, 126, 0.57);
-    border-radius: 3px;
-    height: 50px;
+.settingsAuthAccountTypeContainer {
+    display: flex;
     width: 75%;
+    flex-direction: column;
+}
+
+.settingsAuthAccountTypeHeader {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px 0px;
+    border-bottom: 1px solid #ffffff85;
+    margin-bottom: 30px;
+}
+
+.settingsAuthAccountTypeHeaderLeft {
+    display: flex;
+    column-gap: 5px;
+}
+
+/* Settings add account button styles. */
+.settingsAddAuthAccount {
+    background: none;
+    border: none;
     text-align: left;
-    padding: 0px 50px;
+    padding: 2px 0px;
+    color: white;
     cursor: pointer;
     outline: none;
     transition: 0.25s ease;
 }
-#settingsAddAccount:hover,
-#settingsAddAccount:focus {
-    background: rgba(54, 54, 54, 0.25);
-    text-shadow: 0px 0px 20px white;
+.settingsAddAuthAccount:hover,
+.settingsAddAuthAccount:focus {
+    text-shadow: 0px 0px 20px white, 0px 0px 20px white, 0px 0px 20px white;
 }
-
-/* Settings auth accounts header. */
-#settingsCurrentAccountsHeader {
-    margin: 20px 0px;
+.settingsAddAuthAccount:active {
+    text-shadow: 0px 0px 20px rgba(255, 255, 255, 0.75), 0px 0px 20px rgba(255, 255, 255, 0.75), 0px 0px 20px rgba(255, 255, 255, 0.75);
+    color: rgba(255, 255, 255, 0.75);
+}
+.settingsAddAuthAccount:disabled {
+    color: rgba(255, 255, 255, 0.75);
+    pointer-events: none;
 }
 
 /* Auth account list container styles. */
-#settingsCurrentAccounts {
+.settingsCurrentAccounts {
     margin-bottom: 5%;
 }
-#settingsCurrentAccounts > .settingsAuthAccount:not(:last-child) {
+.settingsCurrentAccounts > .settingsAuthAccount:not(:last-child) {
     margin-bottom: 10px;
 }
-#settingsCurrentAccounts > .settingsAuthAccount:not(:first-child) {
+.settingsCurrentAccounts > .settingsAuthAccount:not(:first-child) {
     margin-top: 10px;
 }
 
 /* Auth account shared styles. */
 .settingsAuthAccount {
     display: flex;
-    width: 75%;
     background: rgba(0, 0, 0, 0.25);
     border-radius: 3px;
     border: 1px solid rgba(126, 126, 126, 0.57);
@@ -2496,7 +2651,7 @@ input:checked + .toggleSwitchSlider:before {
 }
 #landingContainer > #lower > #left #content {
     position: relative;
-    top: 65px;
+    top: 67px;
     display: inline-flex;
     line-height: 24px;
     left: 50px;
@@ -2592,7 +2747,7 @@ input:checked + .toggleSwitchSlider:before {
 
 /* News article title styles. */
 #newsArticleTitle {
-    font-size: 18px;
+    font-size: 25px;
     font-weight: bold;
     font-family: 'Avenir Medium';
     color: white;
@@ -2627,7 +2782,7 @@ input:checked + .toggleSwitchSlider:before {
 #newsArticleDate,
 #newsArticleAuthor {
     display: inline-block;
-    font-size: 10px;
+    font-size: 16px;
     padding: 0px 5px;
     font-weight: bold;
     border-radius: 2px;
@@ -2673,7 +2828,7 @@ input:checked + .toggleSwitchSlider:before {
 
 /* Article content styles. */
 #newsArticleContentScrollable {
-    font-size: 12px;
+    font-size: 18px;
     overflow-y: scroll;
     height: 100%;
     padding: 0px 15px 0px 15px;
@@ -3040,6 +3195,7 @@ input:checked + .toggleSwitchSlider:before {
 #internalMedia, #externalMedia {
     display: flex;
     flex-direction: column;
+    margin-top: -5px;
 }
 
 /* Container object which wraps an icon to ensure fluid transitions. */
@@ -3059,18 +3215,32 @@ input:checked + .toggleSwitchSlider:before {
 }
 
 /* Social media icon shared styles. */
-.mediaSVG {
+
+.webSVG {
     fill: #ffffff;
-    height: 12px;
     transition: 0.25s ease;
     cursor: pointer;
-    height: 20px;
+    height: 21px;
+    width: 25px;
+}
+
+.webSVG:hover,
+.mediaURL:focus .webSVG,
+.webSVG:active {
+    height: 21px;
+}
+
+.mediaSVG {
+    fill: #ffffff;
+    transition: 0.25s ease;
+    cursor: pointer;
+    height: 36px;
     width: 25px;
 }
 .mediaSVG:hover,
 .mediaURL:focus .mediaSVG,
 .mediaSVG:active {
-    height: 20px;
+    height: 36px;
 }
 
 /* Social media URL shared styles. */
@@ -3086,7 +3256,6 @@ input:checked + .toggleSwitchSlider:before {
     display: flex;
     align-items: center;
     outline: none;
-    margin: 3px;
 }
 
 #settingsMediaContainer {
@@ -3094,52 +3263,31 @@ input:checked + .toggleSwitchSlider:before {
 }
 
 /* Settings icon colors. */
-#settingsSVG #openInstanceSVG #settingsSVG{
+#settingsSVG {
     stroke: #ffffff;
-    height: 15px;
+    height: 23px;
 }
-
-#openInstanceSVG:hover {
-    height: 30px;
-}
-
 .mediaButton:hover #settingsSVG,
 .mediaButton:focus #settingsSVG,
 .mediaButton:active #settingsSVG {
-    height: 30px;
-}
-
-#refreshSVG:active {
-    fill: #ffffff;
-}
-#refreshSVG:hover,
-#refreshSVG:focus {
-    fill: #ffffff;
-    height: 30px;
-}
-#refreshSVG:active {
-    fill: #ffffff;
-}
-#refreshMediaButton[inprogress] #refreshSVG {
-    animation: spin 0.8s infinite;
+    height: 23px;
 }
 
 /* Settings tooltip styles. */
 #settingsTooltip {
     visibility: hidden;
     opacity: 0;
-    width: 75px;
-    height: 20px;
+    width: 80px;
+    height: 22px;
     background-color: rgba(0, 0, 0, 0.75);
     text-align: center;
     border-radius: 4px;
     position: absolute;
     z-index: 1;
     right: 130%;
-    font-size: 12px;
+    font-size: 15px;
     line-height: 20px;
     transition: visibility 0s linear 0.25s, opacity 0.25s ease;
-    margin-right: -18px;
 }
 #settingsTooltip::after {
     content: " ";
@@ -3254,7 +3402,7 @@ input:checked + .toggleSwitchSlider:before {
     font-size: 15px;
     font-weight: 900;
     text-shadow: 0px 0px 20px #949494;
-    margin-left: 14px;
+    margin-left: 10px;
 }
 
 /* Wrapper container for the mojang status bar. */
@@ -3347,7 +3495,7 @@ input:checked + .toggleSwitchSlider:before {
 /* Displays the name of the mojang service. */
 .mojangStatusName {
     width: 100%;
-    font-size: 13px;
+    font-size: 10px;
     letter-spacing: 1px;
     line-height: 12px;
     padding: 6px 0px;
@@ -3444,7 +3592,6 @@ input:checked + .toggleSwitchSlider:before {
     letter-spacing: 2px;
     text-shadow: 0px 0px 0px #bebcbb;
     font-size: 20px;
-    margin-right: -35px;
     padding: 0px;
     transition: 0.25s ease;
     outline: none;
@@ -3672,7 +3819,7 @@ input:checked + .toggleSwitchSlider:before {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    height: 75%;
 }
 
 /* Server selection header. */
@@ -3703,7 +3850,7 @@ input:checked + .toggleSwitchSlider:before {
     overflow-y: scroll;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    column-gap: 10px
+    column-gap: 10px;
 }
 #serverSelectListScrollable::-webkit-scrollbar,
 #accountSelectListScrollable::-webkit-scrollbar {
@@ -3777,10 +3924,15 @@ input:checked + .toggleSwitchSlider:before {
 }
 
 /* Add spacing between server listings. */
-#serverSelectListScrollable > .serverListing,
+#serverSelectListScrollable > .serverListing
 #accountSelectListScrollable > .accountListing:not(:first-child):not(:last-child) {
     margin: 5px 0px;
 }
+
+#serverSelectListScrollable > .serverListing, #accountSelectListScrollable > .accountListing:not(:first-child):not(:last-child) {
+    margin: 5px 0px;
+}
+
 #serverSelectListScrollable > .serverListing:first-child,
 #accountSelectListScrollable > .accountListing:first-child {
     margin-bottom: 5px;
@@ -3905,8 +4057,9 @@ input:checked + .toggleSwitchSlider:before {
     color: white;
     font-family: 'Avenir Medium';
     font-weight: bold;
+    font-size: 16px;
     border-radius: 2px;
-    padding: 0px 8.1px;
+    padding: 0px 9.1px;
     cursor: pointer;
     transition: 0.25s ease;
     min-height: 20.67px;
@@ -3928,7 +4081,7 @@ input:checked + .toggleSwitchSlider:before {
 #serverSelectCancel,
 #accountSelectCancel {
     font-weight: bold;
-    font-size: 10px;
+    font-size: 14px;
     text-decoration: none;
     padding-top: 2.5px;
     color: rgba(202, 202, 202, 0.75);
@@ -3936,6 +4089,8 @@ input:checked + .toggleSwitchSlider:before {
     background: none;
     border: none;
     outline: none;
+    cursor: pointer;
+    padding-top: 6px;
     cursor: pointer;
 }
 #serverSelectCancel:hover,
@@ -4009,46 +4164,5 @@ input:checked + .toggleSwitchSlider:before {
 
 /* Class which is applied when the spinner image is spinning. */
 .rotating {
-    animation: rotating 2s linear infinite;
-}
-
-
-
-/* BisectHosting Affiliate Stuff */
-
-#image_bh_container {
-    position: relative;
-    height: 70px;
-    width: 70px;
-    margin-top: 50px;
-
-}
-
-#image_bh {
-    height: 70px;
-    width: auto;
-    position: relative;
-    box-sizing: border-box;
-    margin-left: -45px;
-    cursor: pointer;
-}
-
-#bhTooltip {
-    cursor: pointer;
-    visibility: hidden;
-    opacity: 0;
-    width: 100px;
-    height: 15px;
-    background-color: rgb(0, 0, 0);
-    color: #fff;
-    text-align: center;
-    border-radius: 4px;
-    padding: 2px;
-    position: absolute;
-    z-index: 1;
-    top: 115%;
-    left: -60.5px;
-    font-family: 'Avenir Medium';
-    font-size: 12px;
-    transition: visibility 0s linear 0.25s, opacity 0.25s ease;
+    animation: rotating 10s linear infinite;
 }

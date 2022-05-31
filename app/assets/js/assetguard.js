@@ -16,13 +16,6 @@ const ConfigManager = require('./configmanager')
 const DistroManager = require('./distromanager')
 const isDev         = require('./isdev')
 
-// Constants
-// const PLATFORM_MAP = {
-//     win32: '-windows-x64.tar.gz',
-//     darwin: '-macosx-x64.tar.gz',
-//     linux: '-linux-x64.tar.gz'
-// }
-
 // Classes
 
 /** Class representing a base asset. */
@@ -234,7 +227,7 @@ class JavaGuard extends EventEmitter {
      * Fetch the last open JDK binary.
      * 
      * HOTFIX: Uses Corretto 8 for macOS.
-     * See: https://github.com/VicariousNetwork/VNLauncher/issues/70
+     * See: https://github.com/dscalzi/HeliosLauncher/issues/70
      * See: https://github.com/AdoptOpenJDK/openjdk-support/issues/101
      * 
      * @param {string} major The major version of Java to fetch.
@@ -254,18 +247,19 @@ class JavaGuard extends EventEmitter {
 
         const majorNum = Number(major)
         const sanitizedOS = process.platform === 'win32' ? 'windows' : (process.platform === 'darwin' ? 'mac' : process.platform)
-
         const url = `https://api.adoptium.net/v3/assets/latest/${major}/hotspot?vendor=eclipse`
-        
+
         return new Promise((resolve, reject) => {
             request({url, json: true}, (err, resp, body) => {
                 if(!err && body.length > 0){
+
                     const targetBinary = body.find(entry => {
                         return entry.version.major === majorNum
                             && entry.binary.os === sanitizedOS
                             && entry.binary.image_type === 'jdk'
                             && entry.binary.architecture === 'x64'
                     })
+
                     if(targetBinary != null) {
                         resolve({
                             uri: targetBinary.binary.package.link,
@@ -280,7 +274,6 @@ class JavaGuard extends EventEmitter {
                 }
             })
         })
-
     }
 
     static _latestCorretto(major) {
@@ -1602,7 +1595,7 @@ class AssetGuard extends EventEmitter {
     }
 
     async _extractJdkZip(zipPath, runtimeDir, self) {
-
+                            
         const zip = new StreamZip.async({
             file: zipPath,
             storeEntries: true
